@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <tax>
+            <classes>
+                <dynamic_shipping_tax_class>1</dynamic_shipping_tax_class>
+            </classes>
+        </tax>
+    </default>
+</config>
