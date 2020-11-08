@@ -29,6 +29,11 @@ class ShippingTax
      */
     protected $taxCalculation;
 
+    /**
+     * @var \Magento\Quote\Api\CartRepositoryInterface
+     */
+    protected $cartRepository;
+
     private function getHighestProductTaxClassId($quoteItems, $store)
     {
         $highestTaxClassId = 0;
@@ -67,13 +72,15 @@ class ShippingTax
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Tax\Model\Calculation $taxCalculation,
-        \Magento\Customer\Model\ResourceModel\GroupRepository $groupRepository
+        \Magento\Customer\Model\ResourceModel\GroupRepository $groupRepository,
+        \Magento\Quote\Api\CartRepositoryInterface $cartRepository
     ) {
         $this->configuration = $configuration;
         $this->customerSession = $customerSession;
         $this->checkoutSession = $checkoutSession;
         $this->taxCalculation = $taxCalculation;
         $this->groupRepository = $groupRepository;
+        $this->cartRepository = $cartRepository;
     }
 
     public function afterGetShippingTaxClass(\Magento\Tax\Model\Config $config, int $shippingTaxClass, $store = null)
@@ -83,10 +90,14 @@ class ShippingTax
             return $shippingTaxClass;
         }
 
-        $quoteItems = $this->checkoutSession->getQuote()->getAllItems();
-        if (count($quoteItems) === 0) {
-            return $shippingTaxClass;
+        $quoteId = $this->checkoutSession->getQuoteId();
+        if (!empty($quoteId)) {
+            $quote = $this->cartRepository->get($quoteId);
+            $quoteItems = $quote->getAllItems();
+        } else {
+            $quoteItems = $this->checkoutSession->getQuote()->getAllItems();
         }
+
         $taxClassId = 0;
         if ($dynamicType === \Magesuite\DynamicShippingTaxclass\Model\System\Config\Source\Tax\Dynamic::USE_HIGHEST_PRODUCT_TAX) {
             $taxClassId = $this->getHighestProductTaxClassId($quoteItems, $store);
