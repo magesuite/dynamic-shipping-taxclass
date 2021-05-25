@@ -7,7 +7,7 @@ class ShippingTaxTest extends \Magento\TestFramework\TestCase\AbstractController
     /** @var \Magento\Checkout\Model\Cart */
     protected $cart;
 
-    public function setUp()
+    public function setUp(): void
     {
         $objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
         $this->cart = $objectManager->get(\Magento\Checkout\Model\Cart::class);
