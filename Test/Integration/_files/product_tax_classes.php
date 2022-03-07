@@ -13,7 +13,11 @@ $scopeConfig = $objectManager->create(\Magento\Framework\App\Config\ScopeConfigI
 $countryId = $scopeConfig->getValue(
     'general/country/default',
     \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
-    $storeManager->getStore()->getId());
+    $storeManager->getStore()->getId()
+);
+
+/** @var \Magento\Quote\Model\Quote $quote */
+$quote = $objectManager->get(\Magento\Quote\Model\Quote::class);
 
 /** @var \Magento\Checkout\Model\Session $session */
 $session = $objectManager->create('\Magento\Checkout\Model\Session');
@@ -31,7 +35,7 @@ foreach ($taxes as $tax) {
     $taxClass->save($taxClass);
 
     $taxRate = $objectManager->create(\Magento\Tax\Model\Calculation\Rate::class)
-        ->setCode(sprintf('%s-%0.1lf',  $countryId, $tax))
+        ->setCode(sprintf('%s-%0.1lf', $countryId, $tax))
         ->setTaxCountryId($countryId)
         ->setZipIsRange('0')
         ->setTaxPostcode('*')
@@ -39,9 +43,9 @@ foreach ($taxes as $tax) {
     $taxRate->save();
 
     $taxRule = $objectManager->create(\Magento\Tax\Model\Calculation\Rule::class)
-        ->setCode(sprintf('%s-%0.1lf',  $countryId, $tax))
+        ->setCode(sprintf('%s-%0.1lf', $countryId, $tax))
         ->setPriority(0)
-        ->setCustomerTaxClassIds([ 3 ])
+        ->setCustomerTaxClassIds([ $quote->getCustomerTaxClassId() ])
         ->setProductTaxClassIds([ $taxClass->getId() ])
         ->setTaxRateIds([ $taxRate->getId() ]);
     $taxRule->save();

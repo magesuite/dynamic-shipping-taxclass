@@ -1,6 +1,6 @@
 <?php
 
-namespace Magesuite\DynamicShippingTaxclass\Test\Integration\Plugin;
+namespace Magesuite\DynamicShippingTaxclass\Test\Integration\Plugin\Magento\Tax\Model\Config;
 
 class ShippingTaxTest extends \Magento\TestFramework\TestCase\AbstractController
 {
@@ -39,6 +39,6 @@ class ShippingTaxTest extends \Magento\TestFramework\TestCase\AbstractController
 
     public static function loadProductTaxClasses()
     {
-        include __DIR__.'/../_files/product_tax_classes.php';
+        include __DIR__.'/../../../../../_files/product_tax_classes.php';
     }
 }
