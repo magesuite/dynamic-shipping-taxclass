@@ -10,101 +10,45 @@ class ShippingTax
     protected $configuration;
 
     /**
-     * @var \Magento\Customer\Model\Session
+     * @var \Magesuite\DynamicShippingTaxclass\Model\Command\GetQuoteItems
      */
-    protected $customerSession;
+    protected $getQuoteItems;
 
     /**
-     * @var \Magento\Checkout\Model\Session
+     * @var \Magesuite\DynamicShippingTaxclass\Model\Command\GetHighestProductTaxClassId
      */
-    protected $checkoutSession;
-
-    /**
-     * @var \Magento\Customer\Model\ResourceModel\GroupRepository
-     */
-    protected $groupRepository;
-
-    /**
-     * @var \Magento\Tax\Model\Calculation
-     */
-    protected $taxCalculation;
-
-    /**
-     * @var \Magento\Quote\Api\CartRepositoryInterface
-     */
-    protected $cartRepository;
+    protected $getHighestProductTaxClassId;
 
     public function __construct(
         \Magesuite\DynamicShippingTaxclass\Helper\Configuration $configuration,
-        \Magento\Customer\Model\Session $customerSession,
-        \Magento\Checkout\Model\Session $checkoutSession,
-        \Magento\Tax\Model\Calculation $taxCalculation,
-        \Magento\Customer\Model\ResourceModel\GroupRepository $groupRepository,
-        \Magento\Quote\Api\CartRepositoryInterface $cartRepository
+        \Magesuite\DynamicShippingTaxclass\Model\Command\GetQuoteItems $getQuoteItems,
+        \Magesuite\DynamicShippingTaxclass\Model\Command\GetHighestProductTaxClassId $getHighestProductTaxClassId
     ) {
         $this->configuration = $configuration;
-        $this->customerSession = $customerSession;
-        $this->checkoutSession = $checkoutSession;
-        $this->taxCalculation = $taxCalculation;
-        $this->groupRepository = $groupRepository;
-        $this->cartRepository = $cartRepository;
+        $this->getQuoteItems = $getQuoteItems;
+        $this->getHighestProductTaxClassId = $getHighestProductTaxClassId;
     }
 
     public function afterGetShippingTaxClass(\Magento\Tax\Model\Config $config, int $shippingTaxClass, $store = null)
     {
         $dynamicType = $this->configuration->getDynamicShippingTaxClass();
+
         if ($dynamicType === \Magesuite\DynamicShippingTaxclass\Model\System\Config\Source\Tax\Dynamic::NO_DYNAMIC_SHIPPING_TAX_CALCULATION) {
             return $shippingTaxClass;
         }
 
-        $quoteId = $this->checkoutSession->getQuoteId();
-        if (!empty($quoteId)) {
-            $quote = $this->cartRepository->get($quoteId);
-            $quoteItems = $quote->getAllItems();
-        } else {
-            $quoteItems = $this->checkoutSession->getQuote()->getAllItems();
-        }
+        $quoteItems = $this->getQuoteItems->execute();
 
         $taxClassId = 0;
+
         if ($dynamicType === \Magesuite\DynamicShippingTaxclass\Model\System\Config\Source\Tax\Dynamic::USE_HIGHEST_PRODUCT_TAX) {
-            $taxClassId = $this->getHighestProductTaxClassId($quoteItems, $store);
+            $taxClassId = $this->getHighestProductTaxClassId->execute($quoteItems, $store);
         }
+
         if (!$taxClassId) {
             $taxClassId = $shippingTaxClass;
         }
+
         return $taxClassId;
-    }
-
-    private function getHighestProductTaxClassId($quoteItems, $store)
-    {
-        $highestTaxClassId = 0;
-        $highestTaxPercent = 0.0;
-        foreach ($quoteItems as $quoteItem) {
-            if ($quoteItem->getParentItem()) {
-                continue;
-            }
-            $taxPercent = $quoteItem->getTaxPercent();
-            if ($taxPercent > $highestTaxPercent) {
-                $highestTaxPercent = $taxPercent;
-                $highestTaxClassId = $quoteItem->getTaxClassId();
-            }
-        }
-        return $highestTaxClassId;
-    }
-
-    private function getTaxPercent(int $productTaxClassId, $store)
-    {
-        $groupId = $this->customerSession->getCustomerGroupId();
-        $group = $this->groupRepository->getById($groupId);
-        $customerTaxClassId = $group->getTaxClassId();
-
-        $request = $this->taxCalculation->getRateRequest(null, null, $customerTaxClassId, $store);
-        $request->setData('product_class_id', $productTaxClassId);
-
-        $taxPercent = $this->taxCalculation->getRate($request);
-        if (!$taxPercent) {
-            $taxPercent = 0.0;
-        }
-        return $taxPercent;
     }
 }
