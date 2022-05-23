@@ -37,16 +37,15 @@ class ShippingTax
             return $shippingTaxClass;
         }
 
-        $quoteItems = $this->getQuoteItems->execute();
-
         $taxClassId = 0;
 
         if ($dynamicType === \Magesuite\DynamicShippingTaxclass\Model\System\Config\Source\Tax\Dynamic::USE_HIGHEST_PRODUCT_TAX) {
+            $quoteItems = $this->getQuoteItems->execute();
             $taxClassId = $this->getHighestProductTaxClassId->execute($quoteItems, $store);
         }
 
         if (!$taxClassId) {
-            $taxClassId = $shippingTaxClass;
+            return $shippingTaxClass;
         }
 
         return $taxClassId;

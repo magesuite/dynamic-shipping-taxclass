@@ -10,28 +10,30 @@ class GetQuoteItems
     protected $checkoutSession;
 
     /**
-     * @var \Magento\Quote\Api\CartRepositoryInterface
+     * @var \Magento\Quote\Model\ResourceModel\Quote\Item\CollectionFactory
      */
-    protected $cartRepository;
+    protected $quoteItemCollectionFactory;
 
     public function __construct(
         \Magento\Checkout\Model\Session $checkoutSession,
-        \Magento\Quote\Api\CartRepositoryInterface $cartRepository
+        \Magento\Quote\Model\ResourceModel\Quote\Item\CollectionFactory $quoteItemCollectionFactory
     ) {
 
         $this->checkoutSession = $checkoutSession;
-        $this->cartRepository = $cartRepository;
+        $this->quoteItemCollectionFactory = $quoteItemCollectionFactory;
     }
 
     public function execute()
     {
         $quoteId = $this->checkoutSession->getQuoteId();
 
-        if (!empty($quoteId)) {
-            $quote = $this->cartRepository->get($quoteId);
-            return $quote->getAllItems();
+        if (empty($quoteId)) {
+            return $this->checkoutSession->getQuote()->getAllItems();
         }
 
-        return $this->checkoutSession->getQuote()->getAllItems();
+        $quoteItemCollection = $this->quoteItemCollectionFactory->create();
+        $quoteItemCollection->addFieldToFilter('quote_id', $quoteId);
+
+        return $quoteItemCollection;
     }
 }

@@ -34,16 +34,20 @@ class GetHighestProductTaxClassId
     {
         $highestTaxClassId = 0;
         $highestTaxPercent = 0.0;
+
         foreach ($quoteItems as $quoteItem) {
             if ($quoteItem->getParentItem()) {
                 continue;
             }
-            $taxPercent = $quoteItem->getTaxPercent();
+
+            $taxPercent = $this->getTaxPercent($quoteItem->getTaxClassId(), $store);
+
             if ($taxPercent > $highestTaxPercent) {
                 $highestTaxPercent = $taxPercent;
                 $highestTaxClassId = $quoteItem->getTaxClassId();
             }
         }
+
         return $highestTaxClassId;
     }
 
@@ -57,9 +61,11 @@ class GetHighestProductTaxClassId
         $request->setData('product_class_id', $productTaxClassId);
 
         $taxPercent = $this->taxCalculation->getRate($request);
+
         if (!$taxPercent) {
             $taxPercent = 0.0;
         }
+
         return $taxPercent;
     }
 }
