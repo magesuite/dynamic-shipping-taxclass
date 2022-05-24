@@ -67,7 +67,6 @@ class ShippingTaxTest extends \Magento\TestFramework\TestCase\AbstractController
         $this->assertEquals($quote->getId(), $reloadedQuote->getId());
     }
 
-
     public static function loadProductTaxClasses()
     {
         include __DIR__.'/../../../../../_files/product_tax_classes.php';
