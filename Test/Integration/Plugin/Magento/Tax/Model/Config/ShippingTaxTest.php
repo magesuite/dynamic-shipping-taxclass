@@ -4,13 +4,21 @@ namespace Magesuite\DynamicShippingTaxclass\Test\Integration\Plugin\Magento\Tax\
 
 class ShippingTaxTest extends \Magento\TestFramework\TestCase\AbstractController
 {
-    /** @var \Magento\Checkout\Model\Cart */
+    /**
+     * @var \Magento\TestFramework\ObjectManager
+     */
+    protected $objectManager;
+
+    /**
+     * @var \Magento\Checkout\Model\Cart
+     */
     protected $cart;
 
     public function setUp(): void
     {
-        $objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
-        $this->cart = $objectManager->get(\Magento\Checkout\Model\Cart::class);
+        $this->objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
+
+        $this->cart = $this->objectManager->get(\Magento\Checkout\Model\Cart::class);
     }
 
     /**
@@ -35,6 +43,28 @@ class ShippingTaxTest extends \Magento\TestFramework\TestCase\AbstractController
     {
         $shippingTaxAmount = $this->cart->getQuote()->getShippingAddress()->getShippingTaxAmount();
         $this->assertEquals($shippingTaxAmount, 0.8100);
+    }
+
+    /**
+     * @magentoAppArea frontend
+     * @magentoDataFixture loadProductTaxClasses
+     * @magentoConfigFixture current_store tax/classes/dynamic_shipping_tax_class 2
+     */
+    public function testTriggerRecollectDoesNotCauseInfiniteLoop()
+    {
+        $quote = $this->cart->getQuote();
+
+        $quote->setTotalsCollectedFlag(false);
+        $quote->setTriggerRecollect(true);
+        $quote->save();
+
+        $this->objectManager->removeSharedInstance(\Magento\Checkout\Model\Session::class);
+        $session = $this->objectManager->get(\Magento\Checkout\Model\Session::class);
+
+        $session->setQuoteId($quote->getId());
+        $reloadedQuote = $session->getQuote();
+
+        $this->assertEquals($quote->getId(), $reloadedQuote->getId());
     }
 
     public static function loadProductTaxClasses()
