@@ -36,11 +36,11 @@ class GetHighestProductTaxClassId
         $highestTaxPercent = 0.0;
 
         foreach ($quoteItems as $quoteItem) {
-            if ($quoteItem->getParentItem()) {
+            if ($quoteItem->getParentItem() || $quoteItem->getTaxClassId()) {
                 continue;
             }
 
-            $taxPercent = $this->getTaxPercent($quoteItem->getTaxClassId(), $store);
+            $taxPercent = $this->getTaxPercent((int)$quoteItem->getTaxClassId(), $store);
 
             if ($taxPercent > $highestTaxPercent) {
                 $highestTaxPercent = $taxPercent;
