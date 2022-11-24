@@ -25,7 +25,7 @@ $session = $objectManager->create('\Magento\Checkout\Model\Session');
 /** @var \Magento\Checkout\Model\Cart $cart */
 $cart = $objectManager->get('\Magento\Checkout\Model\Cart');
 
-$taxes = [ 0.2, 0.6, 0.3, 0.9, 0.7, 0.1, 0.5, 0.4, 0.8 ];
+$taxes = [0.2, 0.6, 0.3, 0.9, 0.7, 0.1, 0.5, 0.4, 0.8];
 
 foreach ($taxes as $tax) {
 
@@ -45,9 +45,9 @@ foreach ($taxes as $tax) {
     $taxRule = $objectManager->create(\Magento\Tax\Model\Calculation\Rule::class)
         ->setCode(sprintf('%s-%0.1lf', $countryId, $tax))
         ->setPriority(0)
-        ->setCustomerTaxClassIds([ $quote->getCustomerTaxClassId() ])
-        ->setProductTaxClassIds([ $taxClass->getId() ])
-        ->setTaxRateIds([ $taxRate->getId() ]);
+        ->setCustomerTaxClassIds([$quote->getCustomerTaxClassId()])
+        ->setProductTaxClassIds([$taxClass->getId()])
+        ->setTaxRateIds([$taxRate->getId()]);
     $taxRule->save();
 
     $product = $objectManager->create(\Magento\Catalog\Model\Product::class)
