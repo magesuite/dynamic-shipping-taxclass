@@ -1,0 +1,13 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:MageSuite_Changelog:etc/changelog.xsd">
+    <module id="Magesuite_DynamicShippingTaxclass" name="Magesuite_DynamicShippingTaxclass">
+        <changelog>
+            <tag version="2.0.0" date="2020-11-08">
+                <entry>
+                    <type>INIT</type>
+                    <overview>Initial release</overview>
+                    <description></description>
+                </entry>
+            </tag>
+        </changelog>
+    </module>
+</config>

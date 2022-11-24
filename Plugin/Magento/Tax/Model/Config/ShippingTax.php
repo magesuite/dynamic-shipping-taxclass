@@ -4,20 +4,11 @@ namespace Magesuite\DynamicShippingTaxclass\Plugin\Magento\Tax\Model\Config;
 
 class ShippingTax
 {
-    /**
-     * @var \Magesuite\DynamicShippingTaxclass\Helper\Configuration
-     */
-    protected $configuration;
+    protected \Magesuite\DynamicShippingTaxclass\Helper\Configuration $configuration;
 
-    /**
-     * @var \Magesuite\DynamicShippingTaxclass\Model\Command\GetQuoteItems
-     */
-    protected $getQuoteItems;
+    protected \Magesuite\DynamicShippingTaxclass\Model\Command\GetQuoteItems $getQuoteItems;
 
-    /**
-     * @var \Magesuite\DynamicShippingTaxclass\Model\Command\GetHighestProductTaxClassId
-     */
-    protected $getHighestProductTaxClassId;
+    protected \Magesuite\DynamicShippingTaxclass\Model\Command\GetHighestProductTaxClassId $getHighestProductTaxClassId;
 
     public function __construct(
         \Magesuite\DynamicShippingTaxclass\Helper\Configuration $configuration,

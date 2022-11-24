@@ -4,15 +4,9 @@ namespace Magesuite\DynamicShippingTaxclass\Model\Command;
 
 class GetQuoteItems
 {
-    /**
-     * @var \Magento\Checkout\Model\Session
-     */
-    protected $checkoutSession;
+    protected \Magento\Checkout\Model\Session $checkoutSession;
 
-    /**
-     * @var \Magento\Quote\Model\ResourceModel\Quote\Item\CollectionFactory
-     */
-    protected $quoteItemCollectionFactory;
+    protected \Magento\Quote\Model\ResourceModel\Quote\Item\CollectionFactory $quoteItemCollectionFactory;
 
     public function __construct(
         \Magento\Checkout\Model\Session $checkoutSession,

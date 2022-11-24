@@ -4,20 +4,11 @@ namespace Magesuite\DynamicShippingTaxclass\Model\Command;
 
 class GetHighestProductTaxClassId
 {
-    /**
-     * @var \Magento\Customer\Model\Session
-     */
-    protected $customerSession;
+    protected \Magento\Customer\Model\Session $customerSession;
 
-    /**
-     * @var \Magento\Customer\Model\ResourceModel\GroupRepository
-     */
-    protected $groupRepository;
+    protected \Magento\Customer\Model\ResourceModel\GroupRepository $groupRepository;
 
-    /**
-     * @var \Magento\Tax\Model\Calculation
-     */
-    protected $taxCalculation;
+    protected \Magento\Tax\Model\Calculation $taxCalculation;
 
     public function __construct(
         \Magento\Customer\Model\Session $customerSession,
@@ -36,15 +27,17 @@ class GetHighestProductTaxClassId
         $highestTaxPercent = 0.0;
 
         foreach ($quoteItems as $quoteItem) {
-            if ($quoteItem->getParentItem()) {
+            $taxClassId = $quoteItem->getTaxClassId();
+
+            if ($quoteItem->getParentItem() || !$taxClassId) {
                 continue;
             }
 
-            $taxPercent = $this->getTaxPercent($quoteItem->getTaxClassId(), $store);
+            $taxPercent = $this->getTaxPercent((int)$taxClassId, $store);
 
             if ($taxPercent > $highestTaxPercent) {
                 $highestTaxPercent = $taxPercent;
-                $highestTaxClassId = $quoteItem->getTaxClassId();
+                $highestTaxClassId = $taxClassId;
             }
         }
 
