@@ -8,6 +8,13 @@
                     <description></description>
                 </entry>
             </tag>
+            <tag version="2.0.8" date="2023-09-01">
+                <entry>
+                    <type>FIX</type>
+                    <overview>Fix for the issue reported by error: Exception message: Infinite loop detected</overview>
+                    <ticket_id>IPET-2176</ticket_id>
+                </entry>
+            </tag>
         </changelog>
     </module>
 </config>
