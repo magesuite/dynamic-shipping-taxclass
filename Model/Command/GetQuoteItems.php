@@ -4,30 +4,23 @@ namespace Magesuite\DynamicShippingTaxclass\Model\Command;
 
 class GetQuoteItems
 {
-    protected \Magento\Checkout\Model\Session $checkoutSession;
-
-    protected \Magento\Quote\Model\ResourceModel\Quote\Item\CollectionFactory $quoteItemCollectionFactory;
+    protected \Magento\Checkout\Model\Cart $customerCart;
 
     public function __construct(
-        \Magento\Checkout\Model\Session $checkoutSession,
-        \Magento\Quote\Model\ResourceModel\Quote\Item\CollectionFactory $quoteItemCollectionFactory
+        \Magento\Checkout\Model\Cart $customerCart
     ) {
 
-        $this->checkoutSession = $checkoutSession;
-        $this->quoteItemCollectionFactory = $quoteItemCollectionFactory;
+        $this->customerCart = $customerCart;
     }
 
     public function execute()
     {
-        $quoteId = $this->checkoutSession->getQuoteId();
+        try {
+            $quote = $this->customerCart->getQuote();
 
-        if (empty($quoteId)) {
-            return $this->checkoutSession->getQuote()->getAllItems();
+            return $quote->getAllItems();
+        } catch (\Exception $e) {
+            return [];
         }
-
-        $quoteItemCollection = $this->quoteItemCollectionFactory->create();
-        $quoteItemCollection->addFieldToFilter('quote_id', $quoteId);
-
-        return $quoteItemCollection;
     }
 }
