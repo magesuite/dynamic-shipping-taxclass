@@ -4,4 +4,3 @@
     'Magesuite_DynamicShippingTaxclass',
     __DIR__
 );
-
